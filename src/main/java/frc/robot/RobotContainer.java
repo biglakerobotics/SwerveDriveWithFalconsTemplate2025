@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -30,6 +32,9 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
+    
+    private SlewRateLimiter m_strafeX;
+    private SlewRateLimiter m_strafeY;
 
     private final CommandXboxController joystick = new CommandXboxController(0);
 
@@ -44,12 +49,19 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
+            // drivetrain.applyRequest(() ->
+            //     drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+            //         .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            //         .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            // )
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+                drive.withVelocityX(m_strafeX.calculate(MathUtil.applyDeadband(-joystick.getLeftY(), .1)) * MaxSpeed)
+                .withVelocityY(m_strafeY.calculate(MathUtil.applyDeadband(-joystick.getLeftX(), .1)) * MaxSpeed)
+                .withRotationalRate(MathUtil.applyDeadband(-joystick.getRightX(), .1) * MaxAngularRate)
+        ));
+        
+        m_strafeX = new SlewRateLimiter(Constants.SLEWRATELIMITER);
+        m_strafeY = new SlewRateLimiter(Constants.SLEWRATELIMITER);
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
