@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("yawData", yawData);
     SmartDashboard.putNumber("pitchData", pitchData);
     SmartDashboard.putNumber("skewData", skewData);
-    SmartDashboard.putData("camtotarget", camToTarget);
+    // SmartDashboard.putData("camtotarget", camToTarget);
     SmartDashboard.putNumber("targetArea", areaData);
 
 
