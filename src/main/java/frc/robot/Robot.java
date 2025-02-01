@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.geometry.Transform3d;
@@ -13,15 +15,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private final PhotonCamera photonCamera = new PhotonCamera("dumbdumbcamera");
-  private final RobotContainer m_robotContainer;
-  double yawData = 0;
-  double skewData = 0;
-  double pitchData = 0;
-  double areaData = 0;
-  Transform3d camToTarget;
+  public final PhotonCamera photonCamera = new PhotonCamera("dumbdumbcamera");
+  public final RobotContainer m_robotContainer;
+  public double yawData = 0;
+  public double skewData = 0;
+  public double pitchData = 0;
+  public double areaData = 0;
+  public Transform3d camToTarget;
+
+  
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
@@ -54,6 +59,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("skewData", skewData);
     // SmartDashboard.putData("camtotarget", camToTarget);
     SmartDashboard.putNumber("targetArea", areaData);
+    
 
 
   }
