@@ -5,11 +5,10 @@
 package frc.robot;
 
 import java.util.function.BooleanSupplier;
-
 import org.photonvision.PhotonCamera;
-
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.sendable.Sendable;
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,6 +28,11 @@ public class Robot extends TimedRobot {
   
   public Robot() {
     m_robotContainer = new RobotContainer();
+  }
+
+  @Override
+  public void robotInit() {
+    SignalLogger.start();
   }
 
   @Override
