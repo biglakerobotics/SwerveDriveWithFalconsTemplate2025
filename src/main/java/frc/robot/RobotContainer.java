@@ -9,18 +9,28 @@ import static edu.wpi.first.units.Units.*;
 import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.ElevatorDownCommand;
+import frc.robot.commands.ElevatorTeleOp;
+import frc.robot.commands.ElevatorUpCommand;
 import frc.robot.commands.PhotonVisionCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Elevator;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -39,14 +49,23 @@ public class RobotContainer {
     private SlewRateLimiter m_strafeY;
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final XboxController xboxController = new XboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Elevator m_elevator = new Elevator();
     // public BooleanSupplier spinBoolean;
 
+    private final SendableChooser<Command> autoChooser;
     public RobotContainer() {
         new PhotonVisionCommand(drivetrain).schedule();
 
+        
+
+        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        SmartDashboard.putData("Auto Mode", autoChooser);
         configureBindings();
+
+        m_elevator.setDefaultCommand(new ElevatorTeleOp(xboxController, m_elevator));
     }
 
     private void configureBindings() {
@@ -68,7 +87,7 @@ public class RobotContainer {
         m_strafeX = new SlewRateLimiter(Constants.SLEWRATELIMITER);
         m_strafeY = new SlewRateLimiter(Constants.SLEWRATELIMITER);
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.x().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         ));
@@ -81,6 +100,9 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // joystick.a().and(spinBoolean).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+
+        joystick.y().whileTrue(new ElevatorUpCommand(m_elevator).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+        joystick.a().whileTrue(new ElevatorDownCommand(m_elevator).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
         
 
         // reset the field-centric heading on left bumper press
@@ -89,8 +111,9 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
+
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.getSelected();
     }
     
 

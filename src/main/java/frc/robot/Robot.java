@@ -13,11 +13,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Elevator;
 
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  public final PhotonCamera photonCamera = new PhotonCamera("dumbdumbcamera");
+  // public final PhotonCamera photonCamera = new PhotonCamera("dumbdumbcamera");
   public final RobotContainer m_robotContainer;
   public double yawData = 0;
   public double skewData = 0;
@@ -38,31 +39,31 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run(); 
-    var result = photonCamera.getLatestResult();
-    boolean hasTargets = result.hasTargets();
-    if (hasTargets) {
-      var photonTarget = result.getBestTarget();
-      yawData = photonTarget.getYaw();
-      skewData = photonTarget.getSkew();
-      pitchData = photonTarget.getPitch();
-      camToTarget = photonTarget.getBestCameraToTarget();
-      areaData = photonTarget.getArea();
+    // var result = photonCamera.getLatestResult();
+    // boolean hasTargets = result.hasTargets();
+    // if (hasTargets) {
+    //   var photonTarget = result.getBestTarget();
+    //   yawData = photonTarget.getYaw();
+    //   skewData = photonTarget.getSkew();
+    //   pitchData = photonTarget.getPitch();
+    //   camToTarget = photonTarget.getBestCameraToTarget();
+    //   areaData = photonTarget.getArea();
 
-      // SmartDashboard.putBoolean("works???maybe??", true);
-      // System.out.println("WORKING ITS BUTT OFF");
-    }
-    else{
-      yawData = 0;
-      skewData = 0;
-      pitchData = 0;
-      areaData = 0;
+    //   // SmartDashboard.putBoolean("works???maybe??", true);
+    //   // System.out.println("WORKING ITS BUTT OFF");
+    // }
+    // else{
+    //   yawData = 0;
+    //   skewData = 0;
+    //   pitchData = 0;
+    //   areaData = 0;
 
-    }
-    SmartDashboard.putNumber("yawData", yawData);
-    SmartDashboard.putNumber("pitchData", pitchData);
-    SmartDashboard.putNumber("skewData", skewData);
-    // SmartDashboard.putData("camtotarget", camToTarget);
-    SmartDashboard.putNumber("targetArea", areaData);
+    // }
+    // SmartDashboard.putNumber("yawData", yawData);
+    // SmartDashboard.putNumber("pitchData", pitchData);
+    // SmartDashboard.putNumber("skewData", skewData);
+    // // SmartDashboard.putData("camtotarget", camToTarget);
+    // SmartDashboard.putNumber("targetArea", areaData);
     
 
 
@@ -100,7 +101,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
   public void teleopExit() {}
